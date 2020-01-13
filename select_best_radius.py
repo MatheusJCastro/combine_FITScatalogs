@@ -46,7 +46,7 @@ def main(cat_name_1, cat_name_2, init, end, step):
     fim = time.time()
     print("\033[1;97;42mTime spent to find best radius: {:.2f}s\033[0;0;0m".format(fim - inicio))
 
-    plot_radius(founded, search_radius, show=True, save=True)
+    plot_radius(founded, search_radius, show=True)
 
 
 cat_1 = 'j02_rSDSS_21s.cat'
