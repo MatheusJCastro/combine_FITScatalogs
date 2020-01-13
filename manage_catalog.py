@@ -12,8 +12,8 @@ from astropy.io import fits
 ######################################################################################
 
 
-def save_catalog(catalog_file, ext_names, str_element):
-    data = get_data(catalog_file)  # Get the data
+def save_catalog(catalog_file, ext_names, str_element, ext=2):
+    data = get_data(catalog_file, extension=ext)  # Get the data
     col = len(data[0])  # length of columns
     line = len(data)  # length of lines
 
@@ -45,7 +45,7 @@ def get_header(catalog_file, save=False, extension=2):
         header = np.array(repr(catalog_file[extension].header))
         np.savetxt("Header.txt", [header], fmt="%s")
 
-    # create the elemente list with names of the collumns of the catalog
+    # create the element list with names of the collumns of the catalog
     dic = np.array(catalog_file[extension].header)
     header = catalog_file[extension].header
     element = []
@@ -116,7 +116,7 @@ def close(catalog_file):
 ######################################################################################
 
 
-def setup_catalog(cat_name_1, cat_name_2, show_info=False):
+def setup_catalog(cat_name_1, cat_name_2, show_info=False, ext1=2, ext2=2):
     # Configure catalogs
     catalog_1 = cat_open(cat_name_1)
     catalog_2 = cat_open(cat_name_2)
@@ -126,14 +126,14 @@ def setup_catalog(cat_name_1, cat_name_2, show_info=False):
         print(get_info(catalog_1)[0])
         print(get_info(catalog_2)[0])
 
-    elements = (get_header(catalog_1)[0], get_header(catalog_2)[0])
+    elements = (get_header(catalog_1, extension=ext1)[0], get_header(catalog_2, extension=ext2)[0])
     # elements of catalog 1 and 2
 
-    if elements[0] != elements[1]:
-        print("Error: Catalogs are different.")
-        return -1
+    # if elements[0] != elements[1]:
+    #    print("Error: Catalogs are different.")
+    #    return -1
 
-    data = (get_data(catalog_1), get_data(catalog_2))  # data of catalogs
+    data = (get_data(catalog_1, extension=ext1), get_data(catalog_2, extension=ext2))  # data of catalogs
     close(catalog_1)
     close(catalog_2)
 
@@ -308,16 +308,17 @@ def read_c():
 ######################################################################################
 
 
-def get_mag(data, elements, mag, obj, ind_ar, ind_dc):
+def get_mag(data, elements, mag1, mag2, obj, ind_ar, ind_dc):
     # Get the magnitudes of the cross-matched objects and return two lists:
     # The first one has only the two mags from both catalogs;
     # The second one is formatted to have index from both catalogs, the sky position
     # and the mags.
-    ind = elements[0].index(mag)
+    ind1 = elements[0].index(mag1)
+    ind2 = elements[1].index(mag2)
 
     mags = []
     for i in range(len(obj)):
-        mags.append((data[0][obj[i][0]][ind], data[1][obj[i][1]][ind]))
+        mags.append((data[0][obj[i][0]][ind1], data[1][obj[i][1]][ind2]))
 
     new_mags = []
     for i in range(len(mags)):

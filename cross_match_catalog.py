@@ -106,9 +106,9 @@ def plot_mags(listofmag, ar, dc, save=False, show=False):
         plt.show()
 
 
-def main(cat_name_1, cat_name_2, mag_to_use="MAG_AUTO", threshold=3,
+def main(cat_name_1, cat_name_2, mag_to_use1="MAG_AUTO", mag_to_use2="MAG_AUTO", threshold=3,
          plot=False, plot_select=False, save_cross_match=False, save_plot=False,
-         show_plot=True, c_cross_match=True, read_cross_match=False):
+         show_plot=True, c_cross_match=True, read_cross_match=False, extent1=2, extent2=2):
     # This function do the Cross_Match of two catalogs.
     # It returns a header of the results, the result catalog and then
     # the len of the two catalogs and how many objects were found.
@@ -120,7 +120,7 @@ def main(cat_name_1, cat_name_2, mag_to_use="MAG_AUTO", threshold=3,
     declination_column = "DELTA_J2000"
     c_code_name = "cross-match.so"
 
-    data, elements = mancat.setup_catalog(cat_name_1, cat_name_2)
+    data, elements = mancat.setup_catalog(cat_name_1, cat_name_2, ext1=extent1, ext2=extent2)
 
     ind_alpha = elements[0].index(right_ascension_column)
     ind_delta = elements[0].index(declination_column)
@@ -137,7 +137,7 @@ def main(cat_name_1, cat_name_2, mag_to_use="MAG_AUTO", threshold=3,
         objects = mancat.find_index(data, ind_alpha, ind_delta)
         founded = len(objects)
 
-    mag_pos_list = mancat.get_mag(data, elements, mag_to_use, objects, ind_alpha, ind_delta)[1]
+    mag_pos_list = mancat.get_mag(data, elements, mag_to_use1, mag_to_use2, objects, ind_alpha, ind_delta)[1]
 
     if save_cross_match:
         mancat.save_cross_match_csv(mag_pos_list, right_ascension_column, declination_column)
@@ -156,6 +156,6 @@ def main(cat_name_1, cat_name_2, mag_to_use="MAG_AUTO", threshold=3,
 
 
 # To run this code independently, uncomment the follow lines:
-cat_1 = 'j02-20151112T005311-01_proc.proccat'
-cat_2 = 'j02-20151112T010354-01_proc.proccat'
-main(cat_1, cat_2, threshold=3, plot=True)
+# cat_1 = 'j02-20151112T005311-01_proc.proccat'
+# cat_2 = 'j02-20151112T010354-01_proc.proccat'
+# main(cat_1, cat_2, threshold=3, plot=True)

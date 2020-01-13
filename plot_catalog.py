@@ -17,8 +17,8 @@ catalog = mancat.cat_open('j02-20170711T001143-01_proc.proccat')
 # check the extension do you want to use, the default is 2.
 # info = mancat.get_info(catalog)[0]
 
-elements = mancat.get_header(catalog)[0]  # elements of catalog
-data = mancat.get_data(catalog)  # data of catalog
+elements = mancat.get_header(catalog, extension=2)[0]  # elements of catalog
+data = mancat.get_data(catalog, extension=2)  # data of catalog
 mancat.close(catalog)
 
 choose = True
