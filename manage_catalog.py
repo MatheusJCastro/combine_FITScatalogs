@@ -345,4 +345,14 @@ def del_temp_files(files_names=(".entrada.csv", ".saida.csv")):
 
     print(message)
 
+
+######################################################################################
+
+def combine_cat(cats, matchs):
+    print(len(cats))
+    print(len(matchs))
+
+    return final_cat
+
+
 ######################################################################################

@@ -29,7 +29,7 @@ def plot_radius(radius, arcsec, step_show=1, save=False, show=False):
         plt.show()
 
 
-def main(cat_name_1, cat_name_2, init, end, step):
+def main(cat_name_1, cat_name_2, init, end, step, show_plot=False, save_plot=False):
     inicio = time.time()
     founded = []
     search_radius = np.arange(init, end+step, step)
@@ -46,13 +46,14 @@ def main(cat_name_1, cat_name_2, init, end, step):
     fim = time.time()
     print("\033[1;97;42mTime spent to find best radius: {:.2f}s\033[0;0;0m".format(fim - inicio))
 
-    plot_radius(founded, search_radius, show=True)
+    plot_radius(founded, search_radius, show=show_plot, save=save_plot)
 
 
-cat_1 = 'j02_rSDSS_21s.cat'
+cat_base = 'j02_rSDSS_21s.cat'
+cat_1 = 'j02_rSDSS_2.1s_corrected.cat'
 cat_2 = 'j02_rSDSS_0.21s_corrected.cat'
 
 init_thresh = 0.25
 end_thresh = 10
 step_size = 0.25
-main(cat_1, cat_2, init_thresh, end_thresh, step_size)
+main(cat_base, cat_1, init_thresh, end_thresh, step_size, show_plot=True, save_plot=False)
