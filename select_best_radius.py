@@ -1,7 +1,7 @@
 ###################################################
 # Find the best radius for a Cross-Match          #
 # Matheus J. Castro                               #
-# Version 1.0                                     #
+# Version 1.3                                     #
 # Last Modification: 01/12/2020 (month/day/year)  #
 ###################################################
 

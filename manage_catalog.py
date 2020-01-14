@@ -1,7 +1,7 @@
 ###################################################
 # Manage Fits Catalog                             #
 # Matheus J. Castro                               #
-# Version 4.0                                     #
+# Version 8.3                                     #
 # Last Modification: 01/12/2020 (month/day/year)  #
 ###################################################
 
@@ -229,10 +229,11 @@ def read_cross_match_csv(name_csv):
 ######################################################################################
 
 
-def save_cross_match_csv(list_of_mag, ar, dc):
+def save_cross_match_csv(list_of_mag, ar="", dc="", head=""):
     # Save a csv file that contain the cross-matched objects, their positional in sky
     # and the two mags from both catalogs.
-    head = "Number, Number_1, Number_2, " + ar + ", " + dc + ", MAG_CAT_1, MAG_CAT_2"
+    if head == "":
+        head = "Number, Number_1, Number_2, " + ar + ", " + dc + ", MAG_CAT_1, MAG_CAT_2"
     np.savetxt("Magnitudes_compared.csv", list_of_mag, header=head, fmt="%s", delimiter=",")
 
 
@@ -273,7 +274,7 @@ def save_all_obj(data, ind_ar, ind_dc):
 ######################################################################################
 
 
-def execute_c(c_name, threshold, changedot = 0):
+def execute_c(c_name, threshold, changedot=0):
     # Execute the function py_script from a C code with the name c_name.
     import ctypes
 
@@ -348,11 +349,67 @@ def del_temp_files(files_names=(".entrada.csv", ".saida.csv")):
 
 ######################################################################################
 
-def combine_cat(cats, matchs):
-    print(len(cats))
-    print(len(matchs))
+def combine_cat(headers, cats, matchs):
+    final_cat = []
+
+    flags1 = headers[0].index("FLAGS")
+    flags2 = headers[1].index("FLAGS")
+    magerr1 = headers[0].index("MAGERR_AUTO")
+    magerr2 = headers[1].index("MAGERR_AUTO")
+
+    if len(cats[0]) >= len(cats[1]):
+        cat_base = np.array(cats[0])
+        cat = np.array(cats[1])
+    else:
+        cat_base = np.array(cats[1])
+        cat = np.array(cats[0])
+
+    for i in range(len(cat_base)):
+        if i not in np.array(matchs).T[0] and cat_base[i][flags1] <= 4:
+            final_cat.append(cat_base[i])
+        elif cat_base[i][flags1] <= 4:
+            # The variable obj is the match pair indexes of the catalogs. This line take the first line of the
+            # transpose of the match list and find the index of the number i, i is inside o match list. Then,
+            # with the index, assign the index to the match list to find the tuple that will be analyzed.
+            # The .index(object_in_list) just works with lists, that's why we need .tolist() before it.
+            # The transpose .T just works with numpy arrays.
+            # obj[0] is always equal i.
+            obj = matchs[np.array(matchs).T[0].tolist().index(i)]
+
+            if cat_base[obj[0]][flags1] <= 4 or cat[obj[1]][flags2] <= 4:
+                if cat_base[obj[0]][flags1] < cat[obj[1]][flags2]:
+                    final_cat.append(cat_base[obj[0]])
+                elif cat_base[obj[0]][flags1] > cat[obj[1]][flags2]:
+                    final_cat.append(cat[obj[1]])
+                else:
+                    if cat_base[obj[0]][magerr1] < cat[obj[1]][magerr2]:
+                        final_cat.append(cat_base[obj[0]])
+                    elif cat_base[obj[0]][magerr1] > cat[obj[1]][magerr2]:
+                        final_cat.append(cat[obj[1]])
+
+    for i in range(len(cat)):
+        if i not in np.array(matchs).T[1] and cat[i][flags2] <= 4:
+            final_cat.append(cat_base[i])
+
+    print("len: ", len(final_cat))
 
     return final_cat
 
+
+######################################################################################
+
+def replace_mag_corrected(cats, mag_old, mag_new):
+    from astropy.table import Table
+
+    try:
+        cat0 = Table(cats[0])
+    except TypeError:
+        cat0 = cats[0]
+    cat1 = Table(cats[1])
+    cat1[mag_old] = cat1[mag_new]
+    cat1.remove_column(mag_new)
+    new_cat = [cat0, cat1]
+
+    return new_cat
 
 ######################################################################################

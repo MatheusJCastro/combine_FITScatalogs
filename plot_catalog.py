@@ -1,7 +1,7 @@
 ###########################################
 # Plot Fits Catalog                       #
 # Matheus J. Castro                       #
-# Version 2.2                             #
+# Version 2.4                             #
 # Last Modification: 22/09/2019           #
 ###########################################
 

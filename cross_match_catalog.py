@@ -1,7 +1,7 @@
 ###################################################
 # Cross-Match Fits Catalog                        #
 # Matheus J. Castro                               #
-# Version 6.5                                     #
+# Version 6.7                                     #
 # Last Modification: 01/12/2020 (month/day/year)  #
 ###################################################
 
