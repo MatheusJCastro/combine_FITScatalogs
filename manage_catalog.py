@@ -1,8 +1,8 @@
 ###################################################
 # Manage Fits Catalog                             #
 # Matheus J. Castro                               #
-# Version 8.3                                     #
-# Last Modification: 01/12/2020 (month/day/year)  #
+# Version 9.0                                     #
+# Last Modification: 05/29/2020 (month/day/year)  #
 ###################################################
 
 import numpy as np
@@ -229,6 +229,21 @@ def read_cross_match_csv(name_csv):
 ######################################################################################
 
 
+def save_cross_match_cat(cat, head=""):
+    from astropy.table import Table
+    import os
+
+    file_name = "Results_Combined.cat"
+    if os.path.exists(file_name):
+        os.remove(file_name)
+
+    cat = Table(np.asarray(cat), names=head.split(","))
+    cat.write(file_name, format="fits")  # Only create the file if the file_name doesn't exists.
+
+
+######################################################################################
+
+
 def save_cross_match_csv(list_of_mag, ar="", dc="", head=""):
     # Save a csv file that contain the cross-matched objects, their positional in sky
     # and the two mags from both catalogs.
@@ -389,7 +404,7 @@ def combine_cat(headers, cats, matchs):
 
     for i in range(len(cat)):
         if i not in np.array(matchs).T[1] and cat[i][flags2] <= 4:
-            final_cat.append(cat_base[i])
+            final_cat.append(cat[i])
 
     print("len: ", len(final_cat))
 
