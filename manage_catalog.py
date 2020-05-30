@@ -237,7 +237,7 @@ def save_cross_match_cat(cat, head=""):
     if os.path.exists(file_name):
         os.remove(file_name)
 
-    cat = Table(np.asarray(cat), names=head.split(","))
+    cat = Table(np.asarray(cat), names=head)
     cat.write(file_name, format="fits")  # Only create the file if the file_name doesn't exists.
 
 
@@ -346,6 +346,7 @@ def get_mag(data, elements, mag1, mag2, obj, ind_ar, ind_dc):
 
 ######################################################################################
 
+
 def del_temp_files(files_names=(".entrada.csv", ".saida.csv")):
     # Delete the files listed on files_names variable
     import os
@@ -359,10 +360,11 @@ def del_temp_files(files_names=(".entrada.csv", ".saida.csv")):
         else:
             message = message + "No such file: " + i + "\n"
 
-    print(message)
+    print(message[:-1])
 
 
 ######################################################################################
+
 
 def combine_cat(headers, cats, matchs):
     final_cat = []
@@ -406,25 +408,54 @@ def combine_cat(headers, cats, matchs):
         if i not in np.array(matchs).T[1] and cat[i][flags2] <= 4:
             final_cat.append(cat[i])
 
-    print("len: ", len(final_cat))
+    print("Len: ", len(final_cat))
 
     return final_cat
 
 
 ######################################################################################
 
-def replace_mag_corrected(cats, mag_old, mag_new):
+
+def replace_mag_corrected(cat, mag_old, mag_new):
     from astropy.table import Table
 
     try:
-        cat0 = Table(cats[0])
+        cat = Table(cat)
+    except TypeError:
+        cat = cat
+
+    cat[mag_old] = cat[mag_new]
+    cat.remove_column(mag_new)
+
+    return cat
+
+
+######################################################################################
+
+
+def reorder_cats(cats, header, mag_old, mag_new):
+    from astropy.table import Table
+
+    '''
+    try:
+        cat0 = Table(cats[0], names=header[0])
     except TypeError:
         cat0 = cats[0]
-    cat1 = Table(cats[1])
-    cat1[mag_old] = cat1[mag_new]
-    cat1.remove_column(mag_new)
-    new_cat = [cat0, cat1]
+    except ValueError:
+        cat0 = cats[0]
+    '''
+    cat0 = cats[0]
+    cat1 = Table(cats[1], names=header[1])
 
-    return new_cat
+    cat_new = Table()
+    for i in range(len(header[0])):
+        cat_new.add_column(cat1[header[0][i]], name=header[0][i])
+
+    if mag_new != mag_old:
+        cat_new.add_column(cat1[mag_new], name=mag_new)
+        return [cat0, np.asarray(cat_new)]
+
+    return [cat0, np.asarray(cat1)]
+
 
 ######################################################################################
