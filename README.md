@@ -1,5 +1,6 @@
 *Written by Matheus J. Castro <matheusj_castro@usp.br>  
-Under MIT License.*  
+Under MIT License.  
+Copyright (c) 2020*  
 
 # Combine Catalogs Steps
 This tutorial shows how to using raw data from a set of reduced images, create and combine catalogs using this images.  
