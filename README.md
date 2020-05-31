@@ -119,7 +119,7 @@ python3 combine_catalog.py [options] arguments
 - The first input catalog will be the base for others, and only their columns will be present in the output catalog.
 
 - The [options] are:
-```bash
+```text
  -h,  -help		|	Show this help;
 --h, --help		|	Show this help;
 	-s  [option]	|	Save or not the output catalog
