@@ -107,31 +107,34 @@ python3 combine_catalog.py [options] arguments
 ```bash
  -h,  -help		|	Show this help;
 --h, --help		|	Show this help;
--s  [option]	|	Save or not the output catalog
-				|		0 to not save the output (default);
-				|		1 to save a ".cat" file;
-				|		2 to save ".csv" file;
-				|		3 to save both;
--t  [option]	|	Integer to set the cross-match radius in arc-second;
-				|		(by default is 3)
--e  [options]	|	A list with the extension needs to use for each file.
-				|	It need to be in this format n,n,n... changing "n"
-				|	by the extension you want to use. The order is the
-				|	order of your files input. 1 is the default value,
-				|	if one argument is missing, the default is considered. Zero
-				|	values (like ...n,0,n...) makes the file correspondent
-				|	be set to the default value;
--ep [option]	|	Change the default value for the extensions;
--ra [option]	|	The name of the column for Right Ascension;
-				|		(the default is ALPHA_J2000)
--dc [option]	|	Same as -ra but for Declination;
-				|		(the default is DELTA_J2000)
--m  [options]	|	Same as -e but for the column names of the magnitudes,
-				|	The values need to be in format n,n,n... and the
-				|	default value is MAG_AUTO;
--mp [option]	|	Change the default value for the column name of the magnitudes;
--o  [option]	|	The name of the output catalog WITHOUT extension and spaces. 
-				|	Also option -s must be given. The default it "Results_Combined".
+	-s  [option]	|	Save or not the output catalog
+			|		0 to not save the output (default);
+			|		1 to save a ".cat" file;
+			|		2 to save ".csv" file;
+			|		3 to save both;
+	-t  [option]	|	Integer to set the cross-match radius in arc-second;
+			|		(by default is 3)
+	-e  [options]	|	A list with the extension needs to use for each file.
+			|	It need to be in this format n,n,n... changing "n"
+			|	by the extension you want to use. The order is the
+			|	order of your files input. 1 is the default value,
+			|	if one argument is missing, the default is considered. Zero
+			|	values (like ...n,0,n...) makes the file correspondent
+			|	be set to the default value;
+	-ep [option]	|	Change the default value for the extensions;
+	-ra [option]	|	The name of the column for Right Ascension;
+			|		(the default is ALPHA_J2000)
+	-dc [option]	|	Same as -ra but for Declination;
+			|		(the default is DELTA_J2000)
+	-m  [options]	|	Same as -e but for the column names of the magnitudes,
+			|	The values need to be in format n,n,n... and the
+			|	default value is MAG_AUTO;
+	-mp [option]	|	Change the default value for the column name of the magnitudes;
+	-o  [option]	|	The name of the output catalog WITHOUT extension and spaces. 
+			|	Also option -s must be given. The default it "Results_Combined".
+
+Example:
+python3 combine_catalog.py -s 1 -e 2,1,3,0 -ra MAG_AUTO combine.lis catalog1.cat catalog2.cat
 
 ```
 
