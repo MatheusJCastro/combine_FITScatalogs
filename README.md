@@ -134,7 +134,7 @@ python3 combine_catalog.py [options] arguments
 			|	Also option -s must be given. The default it "Results_Combined".
 
 Example:
-python3 combine_catalog.py -s 1 -e 2,1,3,0 -ra MAG_AUTO combine.lis catalog1.cat catalog2.cat
+python3 combine_catalog.py -s 1 -e 2,1,3,0 -mp MAG_AUTO combine.lis catalog1.cat catalog2.cat
 
 ```
 
