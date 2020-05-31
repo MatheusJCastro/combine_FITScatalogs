@@ -3,8 +3,8 @@ Under MIT License.
 Copyright (c) 2020*  
 
 # Combine Catalogs Steps
-This tutorial shows how to using raw data from a set of reduced images, create and combine catalogs using this images.  
-The process described here need to be done for each set o filter independently.  
+This tutorial shows how to use raw data from a set of reduced images, create and combine catalogs using this images.  
+The process described here needs to be done for each set o filter independently.  
 Here we are using a set from *Observatorio Astrofísco de Javalambre (OAJ)* and the filter used was *rSDSS*.
 More infromation at [https://oajweb.cefca.es/](https://oajweb.cefca.es/)
 
@@ -90,7 +90,7 @@ For the last modification before combining the catalogs, we need to correct the 
 
 - Match the base catalog with one another (max error 3").  
 
-- Then open the table, click with right mouse anywhere and select "New Synthetic Column", this will open a window, fill the boxes whit the information bellow:  
+- Then open the table, click with right mouse anywhere and select "New Synthetic Column", this will open a window, fill the boxes with the information bellow:  
 
 	- Name: **MAG_DIF**
 	- Expression: **MAG_AUTO_1-MAG_AUTO_2**
