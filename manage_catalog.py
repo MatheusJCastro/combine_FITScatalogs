@@ -1,12 +1,13 @@
 ###################################################
 # Manage Fits Catalog                             #
 # Matheus J. Castro                               #
-# Version 9.0                                     #
-# Last Modification: 05/29/2020 (month/day/year)  #
+# Version 9.3                                     #
+# Last Modification: 05/31/2020 (month/day/year)  #
 ###################################################
 
 import numpy as np
 from astropy.io import fits
+from astropy.table import Table
 
 
 ######################################################################################
@@ -150,8 +151,8 @@ def check_equal(n, m, x, y, threshold=3, value=False):
 
     # threshold in given in arcsecond
     # it's needed to transform to degrees
-    threshold = threshold / 60**2
-    module = np.sqrt((n-x)**2 + (m-y)**2)
+    threshold = threshold / 60 ** 2
+    module = np.sqrt((n - x) ** 2 + (m - y) ** 2)
 
     if value:
         return module
@@ -203,7 +204,7 @@ def find_index(data, ind_ar, ind_dc):
             best = j_list[result.index(min(result))]
             equal_objects.append((i, best))
             tam2.remove(best)
-        print("Load: {:.2f}%".format(((i+1)/tam)*100))
+        print("Load: {:.2f}%".format(((i + 1) / tam) * 100))
     print(equal_objects)
     print("Number of founded objects:", len(equal_objects))
 
@@ -221,7 +222,7 @@ def read_cross_match_csv(name_csv):
 
     equal_objects = []
     for i in range(len(loaded)):
-        equal_objects.append((int(loaded[i][1]-1), int(loaded[i][2]-1)))
+        equal_objects.append((int(loaded[i][1] - 1), int(loaded[i][2] - 1)))
 
     return equal_objects
 
@@ -229,16 +230,18 @@ def read_cross_match_csv(name_csv):
 ######################################################################################
 
 
-def save_cross_match_cat(cat, head=""):
-    from astropy.table import Table
+def save_cross_match_cat(cat, name="Results_Combined", fmt="fits"):
     import os
 
-    file_name = "Results_Combined.cat"
+    if fmt == "fits":
+        file_name = "{}.cat".format(name)
+    else:
+        file_name = "{}.csv".format(name)
+
     if os.path.exists(file_name):
         os.remove(file_name)
 
-    cat = Table(np.asarray(cat), names=head)
-    cat.write(file_name, format="fits")  # Only create the file if the file_name doesn't exists.
+    cat.write(file_name, format=fmt)  # Only create the file if the file_name doesn't exists.
 
 
 ######################################################################################
@@ -255,35 +258,24 @@ def save_cross_match_csv(list_of_mag, ar="", dc="", head=""):
 ######################################################################################
 
 
-def save_all_obj(data, ind_ar, ind_dc):
+def save_all_obj(data, ra, dc):
     # Save a csv file to C code read and do the cross-match.
-    ar_list_1 = []
-    dc_list_1 = []
-    ar_list_2 = []
-    dc_list_2 = []
-    for i in range(len(data[0])):
-        ar_list_1.append(data[0][i][ind_ar])
-        dc_list_1.append(data[0][i][ind_dc])
-    for i in range(len(data[1])):
-        ar_list_2.append(data[1][i][ind_ar])
-        dc_list_2.append(data[1][i][ind_dc])
-
-    lista = [(len(data[0]), len(data[1]))]
+    c_list = [(len(data[0]), len(data[1]))]
 
     if len(data[0]) >= len(data[1]):
         for i in range(len(data[0])):
             if i < len(data[1]):
-                lista.append((ar_list_1[i], dc_list_1[i], ar_list_2[i], dc_list_2[i]))
+                c_list.append((data[0][ra][i], data[0][dc][i], data[1][ra][i], data[1][dc][i]))
             else:
-                lista.append((ar_list_1[i], dc_list_1[i], 0., 0.))
+                c_list.append((data[0][ra][i], data[0][dc][i], 0., 0.))
     else:
         for i in range(len(data[1])):
             if i < len(data[0]):
-                lista.append((ar_list_1[i], dc_list_1[i], ar_list_2[i], dc_list_2[i]))
+                c_list.append((data[0][ra][i], data[0][dc][i], data[1][ra][i], data[1][dc][i]))
             else:
-                lista.append((0., 0., ar_list_2[i], dc_list_2[i]))
+                c_list.append((0., 0., data[1][ra][i], data[1][dc][i]))
 
-    np.savetxt(".entrada.csv", lista, fmt="%s", delimiter=";")
+    np.savetxt(".entrada.csv", c_list, fmt="%s", delimiter=";")
 
 
 ######################################################################################
@@ -338,7 +330,7 @@ def get_mag(data, elements, mag1, mag2, obj, ind_ar, ind_dc):
 
     new_mags = []
     for i in range(len(mags)):
-        new_mags.append(("{:d}".format(i+1), obj[i][0]+1, obj[i][1]+1, data[0][obj[i][0]][ind_ar],
+        new_mags.append(("{:d}".format(i + 1), obj[i][0] + 1, obj[i][1] + 1, data[0][obj[i][0]][ind_ar],
                          data[0][obj[i][0]][ind_dc], mags[i][0], mags[i][1]))
 
     return mags, new_mags
@@ -366,96 +358,81 @@ def del_temp_files(files_names=(".entrada.csv", ".saida.csv")):
 ######################################################################################
 
 
-def combine_cat(headers, cats, matchs):
-    final_cat = []
-
-    flags1 = headers[0].index("FLAGS")
-    flags2 = headers[1].index("FLAGS")
-    magerr1 = headers[0].index("MAGERR_AUTO")
-    magerr2 = headers[1].index("MAGERR_AUTO")
+def combine_cat(cats, matchs, magerr, flags):
+    final_cat = Table(names=cats[0].colnames)
 
     if len(cats[0]) >= len(cats[1]):
-        cat_base = np.array(cats[0])
-        cat = np.array(cats[1])
+        cat_base = cats[0]
+        cat = cats[1]
+        obj_order = [0, 1]
     else:
-        cat_base = np.array(cats[1])
-        cat = np.array(cats[0])
+        cat_base = cats[1]
+        cat = cats[0]
+        obj_order = [1, 0]
 
     for i in range(len(cat_base)):
-        if i not in np.array(matchs).T[0] and cat_base[i][flags1] <= 4:
-            final_cat.append(cat_base[i])
-        elif cat_base[i][flags1] <= 4:
+        if i not in np.array(matchs).T[obj_order[0]] and cat_base[flags][i] <= 4:
+            final_cat.add_row(cat_base[i])
+        elif cat_base[flags][i] <= 4:
             # The variable obj is the match pair indexes of the catalogs. This line take the first line of the
             # transpose of the match list and find the index of the number i, i is inside o match list. Then,
             # with the index, assign the index to the match list to find the tuple that will be analyzed.
             # The .index(object_in_list) just works with lists, that's why we need .tolist() before it.
             # The transpose .T just works with numpy arrays.
             # obj[0] is always equal i.
-            obj = matchs[np.array(matchs).T[0].tolist().index(i)]
+            obj = matchs[np.asarray(matchs).T[obj_order[0]].tolist().index(i)]
 
-            if cat_base[obj[0]][flags1] <= 4 or cat[obj[1]][flags2] <= 4:
-                if cat_base[obj[0]][flags1] < cat[obj[1]][flags2]:
-                    final_cat.append(cat_base[obj[0]])
-                elif cat_base[obj[0]][flags1] > cat[obj[1]][flags2]:
-                    final_cat.append(cat[obj[1]])
-                else:
-                    if cat_base[obj[0]][magerr1] < cat[obj[1]][magerr2]:
-                        final_cat.append(cat_base[obj[0]])
-                    elif cat_base[obj[0]][magerr1] > cat[obj[1]][magerr2]:
-                        final_cat.append(cat[obj[1]])
-
+            if cat_base[flags][obj[obj_order[0]]] < cat[flags][obj[obj_order[1]]]:
+                final_cat.add_row(cat_base[obj[obj_order[0]]])
+            elif cat_base[flags][obj[obj_order[0]]] > cat[flags][obj[obj_order[1]]]:
+                final_cat.add_row(cat[obj[obj_order[1]]])
+            else:
+                if cat_base[magerr][obj[obj_order[0]]] < cat[magerr][obj[obj_order[1]]]:
+                    final_cat.add_row(cat_base[obj[obj_order[0]]])
+                elif cat_base[magerr][obj[obj_order[0]]] >= cat[magerr][obj[obj_order[1]]]:
+                    final_cat.add_row(cat[obj[obj_order[1]]])
     for i in range(len(cat)):
-        if i not in np.array(matchs).T[1] and cat[i][flags2] <= 4:
-            final_cat.append(cat[i])
+        if i not in np.array(matchs).T[obj_order[1]] and cat[flags][i] <= 4:
+            final_cat.add_row(cat[i])
 
-    print("Len: ", len(final_cat))
-
+    print("Combined len: ", len(final_cat))
     return final_cat
 
 
 ######################################################################################
 
 
-def replace_mag_corrected(cat, mag_old, mag_new):
-    from astropy.table import Table
+def replace_mag_corrected(cats, mag_1, mag_2):
+    if mag_2 in cats[0].colnames:
+        cats[0].remove_column(mag_2)
+    if mag_1 in cats[1].colnames:
+        cats[1].remove_column(mag_1)
 
-    try:
-        cat = Table(cat)
-    except TypeError:
-        cat = cat
+    cats[1].rename_column(mag_2, mag_1)
 
-    cat[mag_old] = cat[mag_new]
-    cat.remove_column(mag_new)
-
-    return cat
+    return cats
 
 
 ######################################################################################
 
 
-def reorder_cats(cats, header, mag_old, mag_new):
-    from astropy.table import Table
-
-    '''
+def reorder_cats(cats):
+    """
     try:
         cat0 = Table(cats[0], names=header[0])
     except TypeError:
         cat0 = cats[0]
     except ValueError:
         cat0 = cats[0]
-    '''
-    cat0 = cats[0]
-    cat1 = Table(cats[1], names=header[1])
+    """
+    if len(cats[0].colnames) <= len(cats[1].colnames):
+        cat_base = cats[0]
+        cat_modf = cats[1]
+    else:
+        cat_base = cats[1]
+        cat_modf = cats[0]
+    cat_modf = cat_modf[cat_base.colnames]
 
-    cat_new = Table()
-    for i in range(len(header[0])):
-        cat_new.add_column(cat1[header[0][i]], name=header[0][i])
-
-    if mag_new != mag_old:
-        cat_new.add_column(cat1[mag_new], name=mag_new)
-        return [cat0, np.asarray(cat_new)]
-
-    return [cat0, np.asarray(cat1)]
-
+    return [cat_base, cat_modf]
 
 ######################################################################################
