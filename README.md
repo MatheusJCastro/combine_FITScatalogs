@@ -8,7 +8,7 @@ The process described here need to be done for each set o filter independently.
 Here we are using a set from *Observatorio Astrofísco de Javalambre (OAJ)* and the filter used was *rSDSS*.
 More infromation at [https://oajweb.cefca.es/](https://oajweb.cefca.es/)
 
-**Legal Disclaimer: All data published here was previously authorized by the PI Astronomer responsible for this images. The author is not responsible for any unauthorized usage. This purpose of this tutorial is only educational.**
+**Legal Disclaimer: All data published here were previously authorized by PI Astronomer responsible for these images. The author is not responsible for any unauthorized use. The purpose of this tutorial is only educational.**
 
 
 ## Getting the Data
