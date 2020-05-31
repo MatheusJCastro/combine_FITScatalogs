@@ -1,18 +1,28 @@
-# Combine Catalogs Steps
-This tutorial shows how to, using raw data from a set of reduced images from same filter, create and combine catalogs using this images.  
-
 *Written by Matheus J. Castro <matheusj_castro@usp.br>  
 Under MIT License.*  
+
+# Combine Catalogs Steps
+This tutorial shows how to using raw data from a set of reduced images, create and combine catalogs using this images.  
+The process described here need to be done for each set o filter independently.  
+Here we are using a set from *Observatorio Astrofísco de Javalambre (OAJ)* and the filter used was *rSDSS*.
+More infromation at [https://oajweb.cefca.es/](https://oajweb.cefca.es/)
+
+**Legal Disclaimer: All data published here was previously authorized by the PI Astronomer responsible for this images. The author is not responsible for any unauthorized usage. This purpose of this tutorial is only educational.**
+
 
 ## Getting the Data
 Download in TACDATA website **(OAJ)**  inside the TACDATA_1500052 observations the images with the filters you want.  
 
 **[https://tacdata.cefca.es/](https://tacdata.cefca.es/)**
 
-## Extracting
+## SAOImage DS9 - Extracting
+[DS9 Website](https://sites.google.com/cfa.harvard.edu/saoimageds9)
+
 Open DS9 and transform the `.fz` files in the `.fits` just saving again.  
 
-## SWarp - Astromatic
+## Astromatic SWarp - Combining Images
+[SWarp Website](https://www.astromatic.net/software/swarp)
+
 Combine each of the images you get for each exposion time using SWarp. To do that follow this steps:  
 
 - Create the configuration file:  
@@ -31,7 +41,9 @@ ls *.fits > list_name.lis
 swarp @list_name.lis -c default.swarp
 ```
 
-## SExtractor - Astromatic
+## Astromatic SExtractor - Creating Catalogs
+[SExtractor Website](https://www.astromatic.net/software/sextractor)
+
 Now run SExtracor to generate the catalog file following this steps:  
 
 - Create the extended configuration file and the parameters file:  
@@ -70,7 +82,9 @@ sex name_of_the_combined_image.fits
 
 With that, now we have a nice catalog for this exposure time. Do the same for the other exposures.  
 
-## Zero-Point with TOPCAT
+## TOPCAT - Zero-Point fix
+[TOPCAT Website](http://www.star.bris.ac.uk/~mbt/topcat/)
+
 For the last modification before combining the catalogs, we need to correct the zero-point based on one of them. To do that we need TOPCAT:
 
 - Match the base catalog with one another (max error 3").  
