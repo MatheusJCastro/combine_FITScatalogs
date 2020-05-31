@@ -1,9 +1,8 @@
 # Combine Catalogs Steps
 This tutorial shows how to, using raw data from a set of reduced images from same filter, create and combine catalogs using this images.  
 
-*Written by Matheus J. Castro <matheusj_castro@usp.br>
-Under MIT License.*
-
+*Written by Matheus J. Castro <matheusj_castro@usp.br>  
+Under MIT License.*  
 
 ## Getting the Data
 Download in TACDATA website **(OAJ)**  inside the TACDATA_1500052 observations the images with the filters you want.  
